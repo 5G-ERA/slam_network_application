@@ -1,4 +1,4 @@
-# SLAM Netapp
+# SLAM Network Application
 
 Central cloud or edge Map Creator, Map Server and 3D localization
 

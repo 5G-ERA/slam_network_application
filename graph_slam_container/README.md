@@ -55,11 +55,13 @@ To run the demo:
    ```bash
    docker exec docker-octomap-1 \
    /ros_entrypoint.sh \
-   rosrun map_server map_saver -f mymap map:=/robot/projected_map
+   rosrun map_server map_saver \
+   -f /home/robot/octomap/mymap_octomap \
+   map:=/robot/projected_map
    docker exec docker-octomap-1 \
    /ros_entrypoint.sh \
    rosrun octomap_server octomap_saver \
-    -f /home/robot/octomap/mymap_octomap.bt \
+   -f /home/robot/octomap/mymap_octomap.bt \
    octomap_full:=/robot/octomap_full
    ```
 

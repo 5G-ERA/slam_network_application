@@ -17,7 +17,7 @@ services:
     image:
       "europe-southwest1-docker.pkg.dev/\
       robotnik-5830-dev/project-5g-era/\
-      cartographer:cartographer"
+      cartographer:cartographer-melodic-0.9.0"
     environment:
       ROS_HOSTNAME: rosbag
       ROS_MASTER_URI: http://roscore:11311
@@ -42,7 +42,7 @@ services:
     image:
       "europe-southwest1-docker.pkg.dev/\
       robotnik-5830-dev/project-5g-era/\
-      cartographer:cartographer"
+      cartographer:cartographer-melodic-0.9.0"
     environment:
       ROS_HOSTNAME: cartographer
       ROS_MASTER_URI: http://roscore:11311
@@ -70,7 +70,7 @@ services:
     image:
       "europe-southwest1-docker.pkg.dev/\
       robotnik-5830-dev/project-5g-era/\
-      cartographer:octomap"
+      cartographer:octomap-melodic-0.9.0"
     environment:
       ROS_HOSTNAME: octomap
       ROS_MASTER_URI: http://roscore:11311

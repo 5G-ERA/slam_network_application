@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  cartographer:
+    image: but5gera/era_5g_cartographer:0.1.0
+    volumes:
+      - ~/tmp/shared_dir:/root/shared_dir
+    environment:
+      - ROS_DOMAIN_ID=77
+    networks:
+      - my_network
+
+  relay_server1:
+    image: but5gera/ros2_relay_server_slam:1.2.2
+    environment:
+      - ROS_DOMAIN_ID=77
+      - NETAPP_PORT=5897
+      - 'TOPICS_FROM_CLIENT=[{"name": "/robot/odometry/filtered", "type": "nav_msgs/msg/Odometry"},{"name": "/robot/imu/data", "type": "sensor_msgs/msg/Imu", "qos": {"preset": "SENSOR_DATA"}},{"name": "/clock", "type": "rosgraph_msgs/msg/Clock", "qos": {"preset": "SENSOR_DATA"}}]'
+    ports:
+      - 5897:5897
+    networks:
+      - my_network
+
+  relay_server2:
+    image: but5gera/ros2_relay_server_slam:1.2.2
+    environment:
+      - ROS_DOMAIN_ID=77
+      - NETAPP_PORT=5898
+      - 'TOPICS_FROM_CLIENT=[{"name": "/robot/top_laser/point_cloud", "type": "sensor_msgs/msg/PointCloud2", "compression": "draco"}]'
+      - 'TOPICS_TO_CLIENT=[{"name": "/map", "type": "nav_msgs/msg/OccupancyGrid"}]'
+    ports:
+      - 5898:5898
+    networks:
+      - my_network
+
+  relay_server3:
+    image: but5gera/ros2_relay_server_slam:1.2.2
+    environment:
+      - ROS_DOMAIN_ID=77
+      - NETAPP_PORT=5899
+      - 'TRANSFORMS_TO_CLIENT=[{"source_frame": "robot/odom", "target_frame": "map", "angular_thres": 0.1, "trans_thres": 0.001, "max_publish_period": 0.01 }]'
+      - 'SERVICES_FROM_CLIENT=[{"name": "finish_mapping", "type": "era_5g_interfaces/srv/TriggerMap"}, {"name": "start_mapping", "type": "std_srvs/srv/Trigger"}, {"name": "start_localization", "type": "era_5g_interfaces/srv/TriggerMap"}, {"name": "stop_localization", "type": "std_srvs/srv/Trigger"}]'
+    ports:
+      - 5899:5899
+    networks:
+      - my_network
+
+networks:
+  my_network:

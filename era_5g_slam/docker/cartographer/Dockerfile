@@ -9,8 +9,15 @@ RUN apt-get update \
 
 COPY docker/cartographer/start.sh /root/start.sh
 COPY docker/cartographer/DEFAULT_FASTRTPS_PROFILES.xml /root/DEFAULT_FASTRTPS_PROFILES.xml
-COPY docker/cartographer/cartographer.lua /root/cartographer.lua
-COPY docker/cartographer/cartographer.launch /root/cartographer.launch
+
+RUN mkdir -p /root/slam_ws/src 
+RUN mkdir /root/shared_dir
+
+COPY era_5g_cartographer /root/slam_ws/src/era_5g_cartographer
+COPY era_5g_slam_commander /root/slam_ws/src/era_5g_slam_commander
+COPY era_5g_interfaces /root/slam_ws/src/era_5g_interfaces
+
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && cd /root/slam_ws && colcon build"
 
 ENV FASTRTPS_DEFAULT_PROFILES_FILE=/root/DEFAULT_FASTRTPS_PROFILES.xml
 

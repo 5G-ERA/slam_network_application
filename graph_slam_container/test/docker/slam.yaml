@@ -1,0 +1,107 @@
+---
+version: '3.8'
+services:
+  roscore:
+    image: docker.io/ros:melodic-ros-core-bionic
+    environment:
+      ROS_HOSTNAME: roscore
+      ROS_MASTER_URI: http://roscore:11311
+    command: roscore
+    healthcheck:
+      test: ["CMD", "pgrep", "roscore"]
+      interval: 1s
+      timeout: 1s
+      retries: 3
+      start_period: 5s
+  rosbag:
+    image:
+      "europe-southwest1-docker.pkg.dev/\
+      robotnik-5830-dev/project-5g-era/\
+      cartographer:cartographer-melodic-0.9.0"
+    environment:
+      ROS_HOSTNAME: rosbag
+      ROS_MASTER_URI: http://roscore:11311
+    volumes:
+      - type: bind
+        source: ./bags/filtered.bag
+        target: /home/robot/bags/filtered.bag
+    command: >
+      bash -c "
+        rosparam set use_sim_time true &&
+        rosbag play /home/robot/bags/filtered.bag --clock"
+    healthcheck:
+      test: ["CMD", "pgrep", "rosbag"]
+      interval: 1s
+      timeout: 1s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      roscore:
+        condition: service_healthy
+  cartographer:
+    image:
+      "europe-southwest1-docker.pkg.dev/\
+      robotnik-5830-dev/project-5g-era/\
+      cartographer:cartographer-melodic-0.9.0"
+    environment:
+      ROS_HOSTNAME: cartographer
+      ROS_MASTER_URI: http://roscore:11311
+
+      ROBOT_ID: robot
+      USE_DRACO: true
+      MODE: slam # "slam" or "localization"
+      #MODE: localization # "slam" or "localization"
+      SCAN3D_TOPIC: point_cloud_transport/point_cloud
+      ODOM_TOPIC: robotnik_base_control/odom
+      IMU_TOPIC: imu/data
+      GPS_TOPIC: gps/fix        # currently not used
+      LANDMARK_TOPIC: landmark  # currently not used
+      LOAD_STATE_FILENAME: /home/robot/pbstream/demo.bag.pbstream
+
+    volumes:
+      - type: bind
+        source: ./pbstream
+        target: /home/robot/pbstream
+    depends_on:
+      rosbag:
+        condition: service_healthy
+# #### Uncomment the following lines to enable octomap
+  octomap:
+    image:
+      "europe-southwest1-docker.pkg.dev/\
+      robotnik-5830-dev/project-5g-era/\
+      cartographer:octomap"
+    environment:
+      ROS_HOSTNAME: octomap
+      ROS_MASTER_URI: http://roscore:11311
+      ROBOT_ID: robot
+      USE_DRACO: false
+      SCAN3D_TOPIC: point_cloud_transport/point_cloud
+    volumes:
+      - type: bind
+        source: ./octomap
+        target: /home/robot/octomap
+    depends_on:
+      rosbag:
+        condition: service_healthy
+
+  rviz:
+    image:
+      "europe-southwest1-docker.pkg.dev/\
+      robotnik-5830-dev/project-5g-era/\
+      rviz:melodic-slim-1.0.2"
+    environment:
+      ROS_HOSTNAME: rviz
+      ROS_MASTER_URI: http://roscore:11311
+    volumes:
+      - type: bind
+        source: ./rviz/default.rviz
+        target: /opt/ros/melodic/share/rviz/default.rviz
+        read_only: true
+    ports:
+      - target: 80
+        published: 8080
+        protocol: tcp
+    depends_on:
+      roscore:
+        condition: service_healthy

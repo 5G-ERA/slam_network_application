@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'map_creator = era_5g_slam_commander.map_creator:main',
         ],
     },
 )

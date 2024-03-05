@@ -6,7 +6,8 @@ services:
     environment:
       - ROS_DOMAIN_ID=44
       - NETAPP_ADDRESS=http://localhost:5897
-      - 'TOPICS_TO_SERVER=[{"name": "/robot/odometry/filtered", "type": "nav_msgs/msg/Odometry"},{"name": "/robot/imu/data", "type": "sensor_msgs/msg/Imu", "qos": {"preset": "SENSOR_DATA"}},{"name": "/clock", "type": "rosgraph_msgs/msg/Clock", "qos": {"preset": "SENSOR_DATA"}}]'
+      - SEND_CLOCK=True
+      - 'TOPICS_TO_SERVER=[{"name": "/robot/odometry/filtered", "type": "nav_msgs/msg/Odometry"},{"name": "/robot/imu/data", "type": "sensor_msgs/msg/Imu", "qos": {"preset": "SENSOR_DATA"}}, "qos": {"preset": "SENSOR_DATA"}}]'
     network_mode: host
 
   client2:
@@ -22,7 +23,7 @@ services:
     image: but5gera/ros2_relay_client_slam:1.2.2
     environment:
       - ROS_DOMAIN_ID=44
-      - NETAPP_ADDRESS=http://localhost:5897
+      - NETAPP_ADDRESS=http://localhost:5899
       - 'TRANSFORMS_TO_SERVER=[{"source_frame": "robot/base_footprint", "target_frame": "robot/odom", "angular_thres": 0.1, "trans_thres": 0.001, "max_publish_period": 0.01 }, { "source_frame": "robot/imu_link", "target_frame": "robot/base_footprint", "angular_thres": 0.1, "trans_thres": 0.001, "max_publish_period": 0.01 }, { "source_frame": "robot/top_laser_link", "target_frame": "robot/base_footprint", "angular_thres": 0.1, "trans_thres": 0.001, "max_publish_period": 0.01}]'
       - 'SERVICES_TO_SERVER=[{"name": "finish_mapping", "type": "era_5g_interfaces/srv/TriggerMap"}, {"name": "start_mapping", "type": "std_srvs/srv/Trigger"}, {"name": "start_localization", "type": "era_5g_interfaces/srv/TriggerMap"}, {"name": "stop_localization", "type": "std_srvs/srv/Trigger"}]'
     network_mode: host

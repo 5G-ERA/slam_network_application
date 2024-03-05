@@ -25,7 +25,7 @@ services:
     image: but5gera/ros2_relay_server_slam:1.2.2
     environment:
       - ROS_DOMAIN_ID=77
-      - NETAPP_PORT=5898
+      - NETAPP_PORT=5898    
       - 'TOPICS_FROM_CLIENT=[{"name": "/robot/top_laser/point_cloud", "type": "sensor_msgs/msg/PointCloud2", "compression": "draco"}]'
       - 'TOPICS_TO_CLIENT=[{"name": "/map", "type": "nav_msgs/msg/OccupancyGrid"}]'
     ports:

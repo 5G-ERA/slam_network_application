@@ -5,7 +5,7 @@ ENV TZ=Europe/Prague
 ENV LANG C.UTF-8
 
 RUN apt-get update \
-    && apt-get install -y python3-pip ros-humble-cartographer-ros
+    && apt-get install -y python3-pip ros-humble-cartographer-ros ros-humble-point-cloud-transport-plugins ros-humble-octomap-server ros-humble-nav2-map-server
 
 COPY docker/cartographer/start.sh /root/start.sh
 COPY docker/cartographer/DEFAULT_FASTRTPS_PROFILES.xml /root/DEFAULT_FASTRTPS_PROFILES.xml

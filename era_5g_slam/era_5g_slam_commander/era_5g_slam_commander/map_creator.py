@@ -181,7 +181,7 @@ class MapCreatorNode(Node):
                 
                 self.octomap_server_process = self.start_subprocess('ros2 launch era_5g_cartographer ' + self.octomap_executable, env)
                 self.bag_recorder_process.wait()
-                self.map_saver_process = self.start_subprocess('ros2 run nav2_map_server map_saver_cli -t /projected_map -f ' + os.path.join(self.output_folder, self.map_name + '.bt'), env)
+                self.map_saver_process = self.start_subprocess('ros2 run nav2_map_server map_saver_cli -t /projected_map -f ' + os.path.join(self.output_folder, self.map_name), env)
                 self.map_saver_process.wait()
                 self.octomap_server_process.send_signal(signal.SIGINT)
                 self.cartographer_process.send_signal(signal.SIGINT)

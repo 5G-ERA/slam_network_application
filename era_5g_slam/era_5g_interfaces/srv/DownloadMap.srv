@@ -1,0 +1,4 @@
+string map_id    
+---
+uint8[] map     
+string yaml

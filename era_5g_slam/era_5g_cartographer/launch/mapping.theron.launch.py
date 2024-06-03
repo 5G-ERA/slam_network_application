@@ -11,7 +11,7 @@ use_sim_time_param = [{'use_sim_time': use_sim_time}]
 def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('rviz', default_value="False", description='Launch RViz2?'),
-        DeclareLaunchArgument('config', default_value="mapping.bringauto.lua", description='The configuration file for the Summit XL robot.'),
+        DeclareLaunchArgument('config', default_value="mapping.theron.lua", description='The configuration file for the THERON robot.'),
         Node(
             package='cartographer_ros',
             executable='cartographer_node',

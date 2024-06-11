@@ -1,6 +1,6 @@
 
 
-# Notes about running SLAM on the Theron robot
+# Notes about running SLAM localization on the Theron robot
 
 
 ### ROS2 Nodes
@@ -13,7 +13,7 @@ https://github.com/5G-ERA/era_5g_experiments/tree/main/robotnik/theron/nodes
 
 
 #### Fix odometry node
-First the odometry data needs to be fixed. For this, there is an odom_fix.py re-publisher node:
+First, the odometry data needs to be fixed. For this, there is an odom_fix.py re-publisher node:
 
 To run it, simply use:
 
@@ -69,6 +69,8 @@ https://github.com/5G-ERA/slam_network_application/blob/netapp/era_5g_slam/docke
 ```bash
 docker compose up
 ```
+
+Testing can also be performed by running the localization docker image manually and then using the docker-compose_local_test.yml file.
 
 
 ### Switching between two localization sources

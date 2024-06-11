@@ -17,7 +17,7 @@ def generate_launch_description():
             executable='cartographer_node',
             name='cartographer_node',
             parameters=use_sim_time_param,
-            remappings=[('/odom', '/robot/robotnik_base_control/odom'),
+            remappings=[('/odom', '/robot/robotnik_base_control/odom/fixed'),
                         ('/scan_1', '/robot/front_laser/scan'),
                         ('/scan_2', '/robot/rear_laser/scan'),
                         ('/imu', '/robot/imu/data')],
@@ -27,7 +27,7 @@ def generate_launch_description():
         ),
         Node(
             package='cartographer_ros',
-            executable='cartographer_occupancy_grid_node',
+            executable='occupancy_grid_node',
             name='cartographer_occupancy_grid_node',
             parameters=use_sim_time_param,
             arguments=['-resolution', '0.05']

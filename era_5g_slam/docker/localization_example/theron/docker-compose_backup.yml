@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+
+  ros2_relay_client:
+    image: but5gera/ros2_relay_client:1.5.0
+    environment:
+      SEND_CLOCK: True
+      ROS_DOMAIN_ID: 34
+      NETAPP_ADDRESS: http://127.0.0.1:5896
+      
+      TOPICS_TO_SERVER: '[{ "name": "/tf_static", "type": "tf2_msgs/msg/TFMessage", "qos": { "reliability": "RELIABLE", "history": "KEEP_ALL", "durability": "TRANSIENT_LOCAL" } }, {"name": "/synchronized/scan_front", "type": "sensor_msgs/msg/LaserScan", "qos": {"preset": "SENSOR_DATA"}}, {"name": "/synchronized/scan_rear", "type": "sensor_msgs/msg/LaserScan", "qos": {"preset": "SENSOR_DATA"}}, {"name": "/synchronized/odom", "type": "nav_msgs/msg/Odometry"},{"name": "/synchronized/imu", "type": "sensor_msgs/msg/Imu", "qos": {"preset": "SENSOR_DATA"}}]'
+      
+      TOPICS_FROM_SERVER: '[{ "name": "/map", "type": "nav_msgs/msg/OccupancyGrid", "qos": { "reliability": "RELIABLE", "history": "KEEP_LAST", "depth": 1, "durability": "TRANSIENT_LOCAL" } }]'
+      
+      TRANSFORMS_TO_SERVER: '[{"source_frame": "robot/base_link", "target_frame": "robot/odom", "angular_thres": 0.1, "trans_thres": 0.001, "max_publish_period": 0.1 }]'
+
+    ports:
+      -  "5896:5896"
+    network_mode: host
+    ipc: host
+
+  sync:
+    build: ./sync
+    command: python3 /root/sync.py
+    volumes: 
+      - ./sync:/root
+    environment:
+      ROS_DOMAIN_ID: 34
+    network_mode: host
+    ipc: host
+    
+  show_map:
+    build: ./sync
+    command: /root/show_map.sh
+    volumes: 
+      - ./sync:/root
+      - /home/robot/era5g_wp6_demo/maps/map_05:/root/map_data
+    environment:
+      ROS_DOMAIN_ID: 34
+    network_mode: host
+    ipc: host
+    
+  odom_fix:
+    build: /home/robot/era5g_wp6_demo/nodes
+    command: python3 /root/odom_fix.py
+    volumes: 
+      - /home/robot/era5g_wp6_demo/nodes:/root
+    environment:
+      ROS_DOMAIN_ID: 34
+    network_mode: host
+    ipc: host

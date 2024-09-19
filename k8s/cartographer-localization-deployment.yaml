@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: cartographer-localization-claim0
+  name: cartographer-localization-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ros2-relay-server
+  name: ros2-relay-server
+spec:
+  ports:
+    - name: "5896"
+      port: 5896
+      targetPort: 5896
+  selector:
+    app: cartographer-localization
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cartographer-localization
+  name: cartographer-localization
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cartographer-localization
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cartographer-localization
+    spec:
+      restartPolicy: Always
+      volumes:
+        - name: cartographer-localization-claim0
+          persistentVolumeClaim:
+            claimName: cartographer-localization-claim0
+      containers:
+        - name: cartographer-localization
+          env:
+            - name: ROS_DOMAIN_ID
+              value: "54"
+          image: but5gera/cartographer_localization:0.2.0
+          volumeMounts:
+            - mountPath: /root/map_data
+              name: cartographer-localization-claim0
+        - name: ros2-relay-server
+          env:
+            - name: ROS_DOMAIN_ID
+              value: "54"
+            - name: TOPICS_FROM_CLIENT
+              value: '[{ "name": "/tf_static", "type": "tf2_msgs/msg/TFMessage", "qos": { "reliability": "RELIABLE", "history": "KEEP_ALL", "durability": "TRANSIENT_LOCAL" } }, {"name": "/synchronized/draco", "type": "point_cloud_interfaces/msg/CompressedPointCloud2"}, {"name": "/synchronized/odom", "type": "nav_msgs/msg/Odometry"},{"name": "/synchronized/imu", "type": "sensor_msgs/msg/Imu", "qos": {"preset": "SENSOR_DATA"}},{"name": "/clock", "type": "rosgraph_msgs/msg/Clock", "qos": {"preset": "SENSOR_DATA"}}]'
+            - name: TOPICS_TO_CLIENT
+              value: '[{ "name": "/map", "type": "nav_msgs/msg/OccupancyGrid", "qos": { "reliability": "RELIABLE", "history": "KEEP_LAST", "depth": 1, "durability": "TRANSIENT_LOCAL" } }]'
+            - name: TRANSFORMS_TO_CLIENT
+              value: '[{"source_frame": "robot/odom", "target_frame": "map", "angular_thres": 0.1, "trans_thres": 0.001, "max_publish_period": 0.01 }]'
+            - name: USE_SIM_TIME
+              value: "true"
+          image: but5gera/ros2_relay_server:1.5.0
+          ports:
+            - containerPort: 5896
+              protocol: TCP
+

@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  cartographer_localization:
+    image: but5gera/cartographer_localization:0.2.0
+    environment:
+      ROS_DOMAIN_ID: 54
+    volumes:
+#      - "/PATH_TO_THE_SHARED_FOLDER_WITH_MAPS:/root/map_data" 
+# set the path to the shared folder with maps above
+ 
+  ros2_relay_server:
+    image: but5gera/ros2_relay_server:1.5.0
+    environment:
+      USE_SIM_TIME: True
+      ROS_DOMAIN_ID: 54
+      TOPICS_FROM_CLIENT: '[{ "name": "/tf_static", "type": "tf2_msgs/msg/TFMessage", "qos": { "reliability": "RELIABLE", "history": "KEEP_ALL", "durability": "TRANSIENT_LOCAL" } }, {"name": "/synchronized/draco", "type": "point_cloud_interfaces/msg/CompressedPointCloud2"}, {"name": "/synchronized/odom", "type": "nav_msgs/msg/Odometry"},{"name": "/synchronized/imu", "type": "sensor_msgs/msg/Imu", "qos": {"preset": "SENSOR_DATA"}},{"name": "/clock", "type": "rosgraph_msgs/msg/Clock", "qos": {"preset": "SENSOR_DATA"}}]'
+      TOPICS_TO_CLIENT: '[{ "name": "/map", "type": "nav_msgs/msg/OccupancyGrid", "qos": { "reliability": "RELIABLE", "history": "KEEP_LAST", "depth": 1, "durability": "TRANSIENT_LOCAL" } }]'
+      TRANSFORMS_TO_CLIENT: '[{"source_frame": "robot/odom", "target_frame": "map", "angular_thres": 0.1, "trans_thres": 0.001, "max_publish_period": 0.01 }]'
+    ports:
+      -  "5896:5896"
+

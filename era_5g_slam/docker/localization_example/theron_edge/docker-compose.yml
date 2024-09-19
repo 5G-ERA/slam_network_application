@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+
+  cartographer_localization:
+    image: but5gera/cartographer_localization_theron:office-0.2
+    environment:
+      ROS_DOMAIN_ID: 54
+    #volumes:
+      # path to the folder with maps
+      #- "/home/robot/era5g_wp6_demo/maps/map_02:/root/map_data"  
+
+ 
+  ros2_relay_server:
+    image: but5gera/ros2_relay_server:1.5.0
+    environment:
+      USE_SIM_TIME: True
+      ROS_DOMAIN_ID: 54
+      
+      TOPICS_FROM_CLIENT: '[{ "name": "/tf_static", "type": "tf2_msgs/msg/TFMessage", "qos": { "reliability": "RELIABLE", "history": "KEEP_ALL", "durability": "TRANSIENT_LOCAL" } }, {"name": "/synchronized/scan_front", "type": "sensor_msgs/msg/LaserScan", "qos": {"preset": "SENSOR_DATA"}}, {"name": "/synchronized/scan_rear", "type": "sensor_msgs/msg/LaserScan", "qos": {"preset": "SENSOR_DATA"}}, {"name": "/synchronized/odom", "type": "nav_msgs/msg/Odometry"},{"name": "/synchronized/imu", "type": "sensor_msgs/msg/Imu", "qos": {"preset": "SENSOR_DATA"}},{"name": "/clock", "type": "rosgraph_msgs/msg/Clock"}]'
+      
+      TOPICS_TO_CLIENT: '[{ "name": "/map", "type": "nav_msgs/msg/OccupancyGrid", "qos": { "reliability": "RELIABLE", "history": "KEEP_LAST", "depth": 1, "durability": "TRANSIENT_LOCAL" } }]'
+      
+      TRANSFORMS_TO_CLIENT: '[{"source_frame": "robot/odom", "target_frame": "map", "angular_thres": 0.1, "trans_thres": 0.001, "max_publish_period": 0.01 }]'
+      
+    ports:
+      -  "5896:5896"
+

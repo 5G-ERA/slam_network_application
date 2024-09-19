@@ -21,6 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'map_creator = era_5g_slam_commander.map_creator:main',
+            'map_downloader = era_5g_slam_commander.map_downloader:main',
+            'map_downloader_client = era_5g_slam_commander.map_downloader_client:main',
         ],
     },
 )

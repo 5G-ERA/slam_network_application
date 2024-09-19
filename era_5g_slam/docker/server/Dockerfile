@@ -1,4 +1,4 @@
-FROM but5gera/ros2_relay_server:1.2.2
+FROM but5gera/ros2_relay_server:1.3.0
 
 RUN mkdir -p /root/slam_ws/src 
 COPY era_5g_interfaces /root/slam_ws/src/era_5g_interfaces

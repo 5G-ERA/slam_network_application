@@ -19,19 +19,11 @@ def generate_launch_description():
             name='cartographer_node',
             parameters=use_sim_time_param,
             remappings=[('/points2', '/robot/top_laser/point_cloud'), 
-                        ('/imu', '/robot/imu/data'), 
-                        ('/odom', '/robot/odometry/filtered')],
+                        ('/imu', '/synchronized/imu'), 
+                        ('/odom', '/synchronized/odom')],
             arguments=["-configuration_directory", PathJoinSubstitution([FindPackageShare('era_5g_cartographer'), 'config']), 
                        "-configuration_basename", LaunchConfiguration('config'),
-                       "-load_state_filename", LaunchConfiguration('map_file')]
-            
-        ),
-        Node(
-            package='cartographer_ros',
-            executable='cartographer_occupancy_grid_node',
-            name='cartographer_occupancy_grid_node',
-            parameters=use_sim_time_param,
-            arguments=['-resolution', '0.05']
+                       "-load_state_filename", LaunchConfiguration('map_file')] 
         ),
         Node(
             package='rviz2',
@@ -39,7 +31,7 @@ def generate_launch_description():
             name='rviz2',
             parameters=use_sim_time_param,
             condition=IfCondition(LaunchConfiguration('rviz'))
-        )        
+        ),        
     ])
 
 
